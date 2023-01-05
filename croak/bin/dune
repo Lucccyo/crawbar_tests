@@ -1,0 +1,4 @@
+(executable
+ (public_name croak)
+ (name main)
+ (libraries croak crowbar))
