@@ -1,9 +1,12 @@
 open Zed_string
+open Uchar
 
-let uint_to_utf8 u = of_utf8 (Char.(escaped (chr u)))
+let c_to_utf8 c = of_utf8 (Char.(escaped c))
+
+let c_to_uchar_to_utf8 c = 
+  let utf8, remaining = of_uChars [of_char c] in
+  assert (remaining = []);
+  utf8
 
 let () =
-(* Format.printf "%b\n" ((of_utf8 "\001") = (copy (of_utf8 "\001")));
-Format.printf "%b\n" ((of_utf8 "\001") == (copy (of_utf8 "\001"))); *)
-(* Format.printf "\n%c\n" (Char.chr 128); *)
-  Crowbar.(add_test ~name:"testing utf8 conversion" [int] (fun u -> check_eq (uint_to_utf8 u) (copy (uint_to_utf8 u))))
+  Crowbar.(add_test ~name:"testing utf8 conversion" [char] (fun c -> check_eq (c_to_utf8 c) (c_to_uchar_to_utf8 c)))
