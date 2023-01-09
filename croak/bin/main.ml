@@ -1,6 +1,9 @@
-let f l _a = 
-  List.rev l
+open Zed_string
+
+let uint_to_utf8 u = of_utf8 (Char.(escaped (chr u)))
 
 let () =
-  Crowbar.(add_test ~name:"identity A" [list int ; int] (fun l a -> check_eq l (f l a)));
-  Crowbar.(add_test ~name:"identity B" [list int] (fun l -> check_eq l []))
+(* Format.printf "%b\n" ((of_utf8 "\001") = (copy (of_utf8 "\001")));
+Format.printf "%b\n" ((of_utf8 "\001") == (copy (of_utf8 "\001"))); *)
+(* Format.printf "\n%c\n" (Char.chr 128); *)
+  Crowbar.(add_test ~name:"testing utf8 conversion" [int] (fun u -> check_eq (uint_to_utf8 u) (copy (uint_to_utf8 u))))
