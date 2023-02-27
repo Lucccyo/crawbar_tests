@@ -1,24 +1,48 @@
-(* open Zed_string *)
-open Zed_utf8
-(* open Uchar *)
+(* let valid_zed_string uchar_l =
+  let zed_str, _ = Zed_string.of_uChars uchar_l in
+  zed_str
 
-(* let c_to_utf8 c = of_utf8 (Char.(escaped c)) *)
+let uchar_list =
+  let open Crowbar in
+  list uchar *)
+(*
+let uchar_list =
+  let open Crowbar in
+  list uchar *)
 
-(* let c_to_uchar_to_utf8 c = 
-  let utf8, remaining = of_uChars [of_char c] in
-  assert (remaining = []);
-  utf8 *)
+let is_valid_zchar s =
+  match Zed_char.of_utf8 s with
+  | _ -> true
+  | exception Failure _ -> false
+  | exception Zed_utf8.Invalid _ -> false
 
-(* type zutf8 = Zed_utf8.t *)
-
-let contain_first_char str = 
-  match check str with 
-  | Correct length ->
-    if length > 0 then 
-      let first = sub str 0 1 in
-      assert (contains str first)
-    else ()
-  | Message _m -> () 
+let is_valid_zrope n zchr =
+  match Zed_rope.make n zchr with
+  | _ -> true
+  | exception Zed_rope.Out_of_bounds -> false
 
 let () =
-  Crowbar.(add_test ~name:"testing utf8 conversion" [bytes] (fun str -> contain_first_char str))
+  (* let f s _ = if s = "Hello" then failwith "ba" else () in *)
+  Crowbar.(add_test ~name:"width function" [int; int; bytes] (fun n m s ->
+    guard(is_valid_zchar s);
+    let zchr = Zed_char.of_utf8 s in
+    guard(is_valid_zrope n zchr);
+    let zrope = Zed_rope.make n zchr in
+
+    (* let zed_str = valid_zed_string uchar_l in *)
+    (* Crowb r.check_eq zed_str (Zed_string.implode (Zed_string.explode zed_str)) *)
+    (* match Zed_rope.of_string zed_str with
+    | _ -> ()
+    | exception Zed_string.Invalid _ -> ()
+    (* | exception Zed_utf8.Out_of_bounds -> () *)
+    (* | exception Invalid_argument _ -> () *)
+    | exception Zed_utf8.Invalid _ -> () *)
+    match Zed_rope.sub zrope n m with
+    | _ -> ()
+    (* | exception Invalid_argument _ -> () *)
+    (* | exception Failure _ -> () *)
+    | exception Zed_string.Invalid _ -> ()
+    | exception Zed_rope.Out_of_bounds -> ()
+    (* | exception Invalid_argument _ -> () *)
+    | exception Zed_utf8.Invalid _ -> ()
+  ))
