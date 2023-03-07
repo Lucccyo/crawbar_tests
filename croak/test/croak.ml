@@ -2,13 +2,27 @@ let () =
   let engine = Zed_edit.create () in
   let cursor = Zed_edit.new_cursor engine in
   let ctxt = Zed_edit.context engine cursor in
-  Zed_edit.insert ctxt (Zed_rope.of_string (Zed_string.of_utf8 "sdfs "));
+  Zed_edit.insert ctxt (Zed_rope.of_string (Zed_string.of_utf8 "H"));
   Zed_edit.set_mark ctxt;
-  Zed_edit.insert ctxt (Zed_rope.of_string (Zed_string.of_utf8 "\u{c7}sbcouh"));
+  Zed_edit.insert ctxt (Zed_rope.of_string (Zed_string.of_utf8 "ello there, this"));
   Zed_edit.goto_mark ctxt;
-  Zed_edit.delete_next_word ctxt;
-  Format.printf "[%s]@." (Zed_edit.text engine |> Zed_rope.to_string |> Zed_string.to_utf8)
-
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "[%s]@." (Zed_edit.text engine |> Zed_rope.to_string |> Zed_string.to_utf8);
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  Zed_edit.next_word ctxt;
+  Format.printf "%d@." (Zed_edit.column ctxt);
+  ()
 (*
   c82b02865a86  fix default match word
   da7438bb909c  reproduce error with printf

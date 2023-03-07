@@ -25,3 +25,6 @@ doing test only with the error
 ### other
 How many place does the result take
 > du -sh output/crashes/
+
+use a custome a library
+> put `(vendored_dirs zed)` in the main dune file (of the project)
