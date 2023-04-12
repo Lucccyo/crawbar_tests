@@ -1,7 +1,7 @@
 (executable
  (public_name squeak)
  (name main)
- (libraries squeak crowbar opam-file-format))
+ (libraries squeak crowbar opam-file-format fmt))
  (env
   (dev
     (flags (:standard -w -37-34))))
