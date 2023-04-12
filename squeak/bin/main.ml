@@ -32,8 +32,8 @@ let value_kind =
   let open OpamParserTypes.FullPos in
   map[range 4] (fun n ->
     match n with
-    | 0 -> Bool (Random.bool ())
-    | 1 -> Int (Random.int 9)
+    | 0 -> Bool true
+    | 1 -> Int 0
     | 2 -> String "string"
     | 3 -> Ident "ident"
     (* | 3 -> OpamParserTypes.FullPos.Relop (relop ()) value_kind value_kind *)
