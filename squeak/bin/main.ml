@@ -72,7 +72,7 @@ let gen_value =
 let () =
   let open OpamParserTypes.FullPos in
   (* let v = with_pos (Int 4) in *)
-  let v = with_pos (Relop (with_pos `Lt, with_pos (Int 1), with_pos (Int 2))) in
+  let v = with_pos (Relop (with_pos `Lt, with_pos (Int 1), with_pos (Relop (with_pos `Lt, with_pos (Int 1), with_pos (Int 2))))) in
   let printed = OpamPrinter.FullPos.value v in
   Format.print_newline();
   Format.print_newline();
