@@ -4,4 +4,4 @@
  (libraries squeak crowbar opam-file-format fmt))
  (env
   (dev
-    (flags (:standard -w -37-34-32-27))))
+    (flags (:standard -w -37-34-32-27-26))))
