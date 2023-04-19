@@ -14,12 +14,20 @@ let pp_relop ppf relop =
 
 let rec pp_value ppf ({pelem = value_kind; _} : value) =
   match value_kind with
-  | Int n    -> Format.fprintf ppf "Int %d" n
-  | Bool b   -> Format.fprintf ppf "Bool %b" b
-  | String s -> Format.fprintf ppf "String %S" s
+  | Int n    -> Format.fprintf ppf "Int [%d]" n
+  | Bool b   -> Format.fprintf ppf "Bool [%b]" b
+  | String s -> Format.fprintf ppf "String [%S]" s
   | Relop (r, v1, v2) ->
-    Format.fprintf ppf "Relop (%a %a %a)" pp_value v1 pp_relop r.pelem pp_value v2
+    Format.fprintf ppf "Relop [%a %a %a]" pp_value v1 pp_relop r.pelem pp_value v2
+  | List {pelem = l; _} -> Format.fprintf ppf "List [\t%a]" pp_values l
   | _ -> assert false
+and pp_values fmt = function
+| [] -> ()
+| [v] -> pp_value fmt v
+| v :: tl ->
+  pp_value fmt v;
+  Format.fprintf fmt " ; ";
+  pp_values fmt tl
 
 
 let with_pos v : 'a OpamParserTypes.FullPos.with_pos =
@@ -68,21 +76,33 @@ let gen_value =
     (* map [gen_pfxop; gen_v] (fun p v -> with_pos (Pfxop (p, v))) *)
     ] )
 
-
 let () =
   let open OpamParserTypes.FullPos in
-  (* let v = with_pos (Int 4) in *)
-  let v = with_pos (Relop (with_pos `Lt, with_pos (Int 1), with_pos (Relop (with_pos `Lt, with_pos (Int 1), with_pos (Int 2))))) in
+  let v = with_pos (Int 4) in
+  (* let r = with_pos
+    (Relop (with_pos `Lt,
+            with_pos (Int 1),
+            with_pos (Relop (with_pos `Lt,
+                             with_pos (Int 1),
+                             with_pos (Int 2))))) in *)
+  let l = with_pos (List (with_pos [with_pos (Int 3); with_pos (Int 3)])) in
+  let l = with_pos [v; v; l; v] in
+  let v = with_pos (List l) in
+
   let printed = OpamPrinter.FullPos.value v in
   Format.print_newline();
   Format.print_newline();
   Format.printf "[value]\t\t\t%s\n" printed;
+  (* let printed = "1 > (1 > 2)" in *)
+  (* let printed = "1 > 1 > 2" in *)
   Format.fprintf Format.std_formatter "[pp_value]\t\t%a\n" pp_value v;
   let parsed = OpamParser.FullPos.value_from_string printed "" in
   Format.fprintf Format.std_formatter "[pp_value parseprint]\t%a\n" pp_value parsed;
+  (* let parsed_printed = OpamPrinter.FullPos.value parsed in *)
+  (* Format.printf "[parsed_printed]\t%s\n" printed; *)
   Format.print_newline();
-
   ()
+
 
   (* let open OpamPrinter.FullPos in
   Crowbar.(add_test ~name:"parse of print" [gen_value] (fun v ->
