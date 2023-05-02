@@ -149,10 +149,23 @@ let pp_value v name =
   Format.print_newline()
 
 
-let add_group (v: OpamParserTypes.FullPos.value) _cd = with_pos (Group (with_pos [v]))
+let add_group value _cd =
+  (* with_pos (Group (with_pos [with_pos value_kind])) *)
+  match value.pelem with
+  | _ -> assert false
+  | Logop (op, lvk, rvk) ->
+    match op.pelem with
+    | `And -> ()
+    | `Or -> ()
+
+
+
+
+
+
 
 let () =
-  pp_value (add_group pomme 1) "pom";
+  pp_value pomme   "pom";
   pp_value patate  "pat";
   pp_value carotte "car";
   pp_value tomate  "tom";
