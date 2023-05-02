@@ -1,4 +1,6 @@
-type value = OpamParserTypes.FullPos.value_kind OpamParserTypes.FullPos.with_pos
+open OpamParserTypes.FullPos
+
+(* type value = OpamParserTypes.FullPos.value_kind OpamParserTypes.FullPos.with_pos *)
 
 let pp_relop ppf relop =
   match relop with
@@ -58,100 +60,104 @@ and pp_values fmt = function
 let with_pos v : 'a OpamParserTypes.FullPos.with_pos =
   { pelem = v; pos = { filename = ""; start = 0,0; stop = 0,0 } }
 
+
+let pomme = with_pos
+  (Logop (with_pos `Or,
+          with_pos (Logop (with_pos `Or,
+                           with_pos (Int 1),
+                           with_pos (Int 2)
+                          )),
+          with_pos (Int 3)
+         )
+  )
+
+let patate = with_pos
+  (Logop (with_pos `Or,
+          with_pos (Int 1),
+          with_pos (Logop (with_pos `Or,
+                           with_pos (Int 2),
+                           with_pos (Int 3)
+                          ))
+         )
+  )
+
+
+let carotte = with_pos
+  (Logop (with_pos `Or,
+          with_pos (Logop (with_pos `And,
+                            with_pos (Int 1),
+                            with_pos (Int 2)
+                          )),
+          with_pos (Int 3)
+          )
+  )
+
+let tomate = with_pos
+  (Logop (with_pos `Or,
+          with_pos (Int 1),
+          with_pos (Logop (with_pos `And,
+                            with_pos (Int 2),
+                            with_pos (Int 3)
+                          ))
+          )
+  )
+
+let melon = with_pos
+  (Logop (with_pos `And,
+          with_pos (Logop (with_pos `And,
+                            with_pos (Int 1),
+                            with_pos (Int 2)
+                          )),
+          with_pos (Int 3)
+          )
+  )
+
+let kiwi = with_pos
+  (Logop (with_pos `And,
+          with_pos (Int 1),
+          with_pos (Logop (with_pos `And,
+                            with_pos (Int 2),
+                            with_pos (Int 3)
+                          ))
+          )
+  )
+
+let radis = with_pos
+  (Logop (with_pos `And,
+          with_pos (Logop (with_pos `Or,
+                            with_pos (Int 1),
+                            with_pos (Int 2)
+                          )),
+          with_pos (Int 3)
+          )
+  )
+
+let poire = with_pos
+  (Logop (with_pos `And,
+          with_pos (Int 1),
+          with_pos (Logop (with_pos `Or,
+                            with_pos (Int 2),
+                            with_pos (Int 3)
+                          ))
+          )
+  )
+
+let pp_value v name =
+  let printed = OpamPrinter.FullPos.value v in
+  Format.print_newline();
+  Format.printf "[%s]\t%s\n" name printed;
+  Format.print_newline()
+
+
+let add_group (v: OpamParserTypes.FullPos.value) _cd = with_pos (Group (with_pos [v]))
+
 let () =
-  let open OpamParserTypes.FullPos in
-  let pomme = with_pos
-    (Logop (with_pos `Or,
-            with_pos (Logop (with_pos `Or,
-                             with_pos (Int 1),
-                             with_pos (Int 2)
-                            )),
-            with_pos (Int 3)
-           )
-    ) in
-
-  let patate = with_pos
-    (Logop (with_pos `Or,
-            with_pos (Int 1),
-            with_pos (Logop (with_pos `Or,
-                             with_pos (Int 2),
-                             with_pos (Int 3)
-                            ))
-           )
-    ) in
-
-
-  let carotte = with_pos
-    (Logop (with_pos `Or,
-            with_pos (Logop (with_pos `And,
-                              with_pos (Int 1),
-                              with_pos (Int 2)
-                            )),
-            with_pos (Int 3)
-            )
-    ) in
-
-  let tomate = with_pos
-    (Logop (with_pos `Or,
-            with_pos (Int 1),
-            with_pos (Logop (with_pos `And,
-                              with_pos (Int 2),
-                              with_pos (Int 3)
-                            ))
-            )
-    ) in
-
-  let melon = with_pos
-    (Logop (with_pos `And,
-            with_pos (Logop (with_pos `And,
-                              with_pos (Int 1),
-                              with_pos (Int 2)
-                            )),
-            with_pos (Int 3)
-            )
-    ) in
-
-  let kiwi = with_pos
-    (Logop (with_pos `And,
-            with_pos (Int 1),
-            with_pos (Logop (with_pos `And,
-                              with_pos (Int 2),
-                              with_pos (Int 3)
-                            ))
-            )
-    ) in
-
-  let radis = with_pos
-    (Logop (with_pos `And,
-            with_pos (Logop (with_pos `Or,
-                              with_pos (Int 1),
-                              with_pos (Int 2)
-                            )),
-            with_pos (Int 3)
-            )
-    ) in
-
-  let poire = with_pos
-    (Logop (with_pos `And,
-            with_pos (Int 1),
-            with_pos (Logop (with_pos `Or,
-                              with_pos (Int 2),
-                              with_pos (Int 3)
-                            ))
-            )
-    ) in
-
-  let pp_value v =
-    let printed = OpamPrinter.FullPos.value patate in
-    Format.print_newline();
-    Format.printf "[value]\t\t\t%s\n" printed;
-    Format.print_newline() in
-  pp_value pomme;
-  pp_value patate;
-  pp_value carotte;
-  pp_value tomate;
-  pp_value melon;
-  pp_value kiwi;
-  pp_value radis;
-  pp_value poire;
+  pp_value (add_group pomme 1) "pom";
+  pp_value patate  "pat";
+  pp_value carotte "car";
+  pp_value tomate  "tom";
+  pp_value melon   "mel";
+  pp_value kiwi    "kiw";
+  pp_value radis   "rad";
+  pp_value poire   "poi";
   ()
