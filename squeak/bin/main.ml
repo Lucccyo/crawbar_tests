@@ -58,82 +58,100 @@ and pp_values fmt = function
 let with_pos v : 'a OpamParserTypes.FullPos.with_pos =
   { pelem = v; pos = { filename = ""; start = 0,0; stop = 0,0 } }
 
-
-(* let gen_relop : OpamParserTypes.FullPos.relop Crowbar.gen =
-  let open Crowbar in
-  map[range 6] (fun n ->
-    match n with
-    | 0 -> with_pos `Eq
-    | 1 -> with_pos `Neq
-    | 2 -> with_pos `Geq
-    | 3 -> with_pos `Gt
-    | 4 -> with_pos `Leq
-    | 5 -> with_pos `Lt
-    | _ -> assert false) *)
-
-(* let gen_logop : OpamParserTypes.FullPos.logop Crowbar.gen =
-  let open Crowbar in
-  map[range 2] (fun n ->
-    match n with
-    | 0 -> with_pos `And
-    | 1 -> with_pos `Or
-    | _ -> assert false) *)
-
-
-(* let gen_pfxop : OpamParserTypes.FullPos.pfxop Crowbar.gen =
-  let open Crowbar in
-  map[range 2] (fun n ->
-    match n with
-    | 0 -> with_pos `Not
-    | 1 -> with_pos `Defined
-    | _ -> assert false) *)
-
-(* let gen_value =
-  let open Crowbar in
-  let open OpamParserTypes.FullPos in
-  fix (fun gen_v ->
-    choose [
-    (* map [int]   (fun i -> with_pos (Int i)); *)
-    (* map [gen_relop; gen_v; gen_v] (fun r v1 v2 -> with_pos (Relop (r, v1, v2))); *)
-    map [bool]  (fun b -> with_pos (Bool b));
-    (* map [bytes] (fun _ -> with_pos (String "toto")); *)
-    (* map [gen_relop; gen_v] (fun r v -> with_pos (Prefix_relop (r, v))); *)
-    map [gen_logop; gen_v; gen_v] (fun l v1 v2 -> with_pos (Logop (l, v1, v2)));
-    (* map [gen_pfxop; gen_v] (fun p v -> with_pos (Pfxop (p, v))) *)
-    ] ) *)
-
-
 let () =
   let open OpamParserTypes.FullPos in
-  
+  let pomme = with_pos
+    (Logop (with_pos `Or,
+            with_pos (Logop (with_pos `Or,
+                             with_pos (Int 1),
+                             with_pos (Int 2)
+                            )),
+            with_pos (Int 3)
+           )
+    ) in
+
+  let patate = with_pos
+    (Logop (with_pos `Or,
+            with_pos (Int 1),
+            with_pos (Logop (with_pos `Or,
+                             with_pos (Int 2),
+                             with_pos (Int 3)
+                            ))
+           )
+    ) in
 
 
+  let carotte = with_pos
+    (Logop (with_pos `Or,
+            with_pos (Logop (with_pos `And,
+                              with_pos (Int 1),
+                              with_pos (Int 2)
+                            )),
+            with_pos (Int 3)
+            )
+    ) in
 
+  let tomate = with_pos
+    (Logop (with_pos `Or,
+            with_pos (Int 1),
+            with_pos (Logop (with_pos `And,
+                              with_pos (Int 2),
+                              with_pos (Int 3)
+                            ))
+            )
+    ) in
 
-  let printed = "a | (b & c)" in
-  (* let printed = "((a | b) | ((c & d) & e))" in *)
-  (* let printed = "a & v | b | d & t" in *)
-  (* let printed = "(((a & v) | b) | (d & t))" in *)
-  Format.print_newline();
-  Format.print_newline();
-  Format.printf "[input]\t\t\t%s\n" printed;
-  let parsed = OpamParser.FullPos.value_from_string printed "" in
-  (* Format.fprintf Format.std_formatter "[pp_value parseprint]\t%a\n" pp_value parsed; *)
-  let parsed_printed = OpamPrinter.FullPos.value parsed in
-  Format.printf "[output]\t\t%s\n" parsed_printed;
-  (* Format.printf "[expected]\t\t((a | (b | (c & d))) & e)\n"; *)
-  (* Format.printf "[expected]\t\t((a | b) | ((c & d) & e))\n"; *)
-  Format.print_newline();
+  let melon = with_pos
+    (Logop (with_pos `And,
+            with_pos (Logop (with_pos `And,
+                              with_pos (Int 1),
+                              with_pos (Int 2)
+                            )),
+            with_pos (Int 3)
+            )
+    ) in
+
+  let kiwi = with_pos
+    (Logop (with_pos `And,
+            with_pos (Int 1),
+            with_pos (Logop (with_pos `And,
+                              with_pos (Int 2),
+                              with_pos (Int 3)
+                            ))
+            )
+    ) in
+
+  let radis = with_pos
+    (Logop (with_pos `And,
+            with_pos (Logop (with_pos `Or,
+                              with_pos (Int 1),
+                              with_pos (Int 2)
+                            )),
+            with_pos (Int 3)
+            )
+    ) in
+
+  let poire = with_pos
+    (Logop (with_pos `And,
+            with_pos (Int 1),
+            with_pos (Logop (with_pos `Or,
+                              with_pos (Int 2),
+                              with_pos (Int 3)
+                            ))
+            )
+    ) in
+
+  let pp_value v =
+    let printed = OpamPrinter.FullPos.value patate in
+    Format.print_newline();
+    Format.printf "[value]\t\t\t%s\n" printed;
+    Format.print_newline() in
+  pp_value pomme;
+  pp_value patate;
+  pp_value carotte;
+  pp_value tomate;
+  pp_value melon;
+  pp_value kiwi;
+  pp_value radis;
+  pp_value poire;
   ()
-
-  (* let open OpamPrinter.FullPos in
-  Crowbar.(add_test ~name:"parse of print" [gen_value] (fun v ->
-    let printed = value v in
-    Format.printf ">> ";
-    pp_value Format.std_formatter v;
-    Format.printf "\n";
-    (* let t = with_pos Relop *)
-    (* check_eq ~pp:pp_value ~eq:value_equals t vv; *)
-    check_eq ~pp:pp_value ~eq:value_equals v (OpamParser.FullPos.value_from_string printed "");
-    ()
-  )) *)
