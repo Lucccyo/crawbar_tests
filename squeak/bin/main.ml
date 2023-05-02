@@ -149,28 +149,44 @@ let pp_value v name =
   Format.print_newline()
 
 
-let add_group value _cd =
+let rec add_group ?(p = -1) value context =
   (* with_pos (Group (with_pos [with_pos value_kind])) *)
   match value.pelem with
-  | _ -> assert false
   | Logop (op, lvk, rvk) ->
-    match op.pelem with
-    | `And -> ()
-    | `Or -> ()
+    (* if context = None then (
+      add_group lvk (Some (op.pelem)) ~p:0;
+      add_group rvk (Some (op.pelem)) ~p:1;)
+    else *)
+      if Option.(p = 1 && get context = op.pelem) ||
+         (Option.get context = `And && op.pelem = `Or) then
+      with_pos (Group (with_pos [value]))
+    else value
+  | Int n -> with_pos (Int n)
+  | _ -> assert false
 
 
-
+let add_group value = add_group value None
 
 
 
 
 let () =
-  pp_value pomme   "pom";
+  (* add_group pomme;
+  add_group patate;
+  add_group carotte;
+  add_group tomate;
+  add_group melon;
+  add_group kiwi;
+  add_group radis;
+  add_group poire; *)
+
+
+  (* pp_value pomme   "pom";
   pp_value patate  "pat";
   pp_value carotte "car";
   pp_value tomate  "tom";
   pp_value melon   "mel";
   pp_value kiwi    "kiw";
   pp_value radis   "rad";
-  pp_value poire   "poi";
+  pp_value poire   "poi"; *)
   ()
