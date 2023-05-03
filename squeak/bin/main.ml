@@ -142,22 +142,16 @@ let poire = with_pos
           )
   )
 
-let pp_value v name =
-  let printed = OpamPrinter.FullPos.value v in
-  Format.print_newline();
-  Format.printf "[%s]\t%s\n" name printed;
-  Format.print_newline()
-
-
 let rec add_group ?(p = -1) value context =
   (* with_pos (Group (with_pos [with_pos value_kind])) *)
   match value.pelem with
   | Logop (op, lvk, rvk) ->
-    (* if context = None then (
-      add_group lvk (Some (op.pelem)) ~p:0;
-      add_group rvk (Some (op.pelem)) ~p:1;)
-    else *)
-      if Option.(p = 1 && get context = op.pelem) ||
+    if context = None then
+      with_pos (Logop (op,
+          add_group lvk (Some (op.pelem)) ~p:0,
+          add_group rvk (Some (op.pelem)) ~p:1))
+    else
+      if (p = 1 && Option.get context = op.pelem) ||
          (Option.get context = `And && op.pelem = `Or) then
       with_pos (Group (with_pos [value]))
     else value
@@ -167,7 +161,13 @@ let rec add_group ?(p = -1) value context =
 
 let add_group value = add_group value None
 
-
+let pp_value_and_grouped v name =
+  Format.print_newline();
+  let printed = OpamPrinter.FullPos.value v in
+  Format.printf "[%s]\t%s\n" name printed;
+  let printed = OpamPrinter.FullPos.value (add_group v) in
+  Format.printf "[G-%s]\t%s\n" name printed;
+  Format.print_newline()
 
 
 let () =
@@ -181,12 +181,12 @@ let () =
   add_group poire; *)
 
 
-  (* pp_value pomme   "pom";
-  pp_value patate  "pat";
-  pp_value carotte "car";
-  pp_value tomate  "tom";
-  pp_value melon   "mel";
-  pp_value kiwi    "kiw";
-  pp_value radis   "rad";
-  pp_value poire   "poi"; *)
+  pp_value_and_grouped pomme   "pom";
+  pp_value_and_grouped patate  "pat";
+  pp_value_and_grouped carotte "car";
+  pp_value_and_grouped tomate  "tom";
+  pp_value_and_grouped melon   "mel";
+  pp_value_and_grouped kiwi    "kiw";
+  pp_value_and_grouped radis   "rad";
+  pp_value_and_grouped poire   "poi";
   ()
