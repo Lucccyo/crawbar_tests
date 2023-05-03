@@ -48,8 +48,8 @@ let kiwi = with_pos
 let radis = with_pos
   (Logop (with_pos `And,
           with_pos (Logop (with_pos `Or,
-                           with_pos (Int 1),
-                           with_pos (Int 2))),
+                           pomme,
+                           kiwi)),
           with_pos (Int 3)))
 
 let poire = with_pos
@@ -59,22 +59,29 @@ let poire = with_pos
                            with_pos (Int 2),
                            with_pos (Int 3)))))
 
-let rec add_group ?(p = -1) value context =
+let decide context p pelem =
+  (p && context = pelem) || (context = `And && pelem = `Or)
+
+let rec add_group value context p =
   match value.pelem with
   | Logop (op, lvk, rvk) ->
-    if context = None then
-      with_pos (Logop (op,
-          add_group lvk (Some (op.pelem)) ~p:0,
-          add_group rvk (Some (op.pelem)) ~p:1))
-    else
-      if (p = 1 && Option.get context = op.pelem) ||
-         (Option.get context = `And && op.pelem = `Or) then
-      with_pos (Group (with_pos [value]))
-    else value
-  | Int n -> with_pos (Int n)
+      let v = logop op lvk rvk in
+      if decide context p op.pelem
+        then with_pos (Group (with_pos [v]))
+        else v
+  | Int _ -> value
   | _ -> assert false
 
-let add_group value = add_group value None
+and logop op lvk rvk =
+  let v = Logop (op,
+    add_group lvk op.pelem false,
+    add_group rvk op.pelem true) in
+  with_pos v
+
+let add_group value = match value.pelem with
+  | Logop (op, lvk, rvk) -> logop op lvk rvk
+  | Int _ -> value
+  | _ -> assert false
 
 let pp_value_and_grouped v name =
   let printed = OpamPrinter.FullPos.value v in
